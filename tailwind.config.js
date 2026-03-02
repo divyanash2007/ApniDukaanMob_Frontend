@@ -20,6 +20,15 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+      },
+      keyframes: {
+        scan: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(250px)' }, // Moves down the height of the min-h-[250px] container
+        }
+      },
+      animation: {
+        scan: 'scan 2s ease-in-out infinite',
       }
     },
   },

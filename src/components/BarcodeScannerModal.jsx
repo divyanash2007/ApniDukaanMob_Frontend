@@ -16,14 +16,7 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
                 scannerRef.current = new Html5Qrcode("reader");
 
                 const config = {
-                    fps: 10,
-                    qrbox: { width: 250, height: 100 },
-                    formatsToSupport: [
-                        window.Html5QrcodeSupportedFormats.EAN_13,
-                        window.Html5QrcodeSupportedFormats.EAN_8,
-                        window.Html5QrcodeSupportedFormats.CODE_128,
-                        window.Html5QrcodeSupportedFormats.CODE_39
-                    ]
+                    fps: 20
                 };
 
                 // Request the back camera explicitly
@@ -74,7 +67,7 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <div className="flex items-center gap-2">
@@ -99,6 +92,13 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
 
                         {/* Container must have static position to work best with library */}
                         <div className="relative w-full rounded-2xl overflow-hidden shadow-inner border border-gray-200 bg-black min-h-[250px] flex items-center justify-center">
+                            {/* Scanning Animation Overlay */}
+                            {!isStarting && (
+                                <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
+                                    <div className="w-full h-0.5 bg-brand absolute top-0 left-0 right-0 custom-scanner-beam" style={{ boxShadow: '0 0 10px 2px rgba(0, 209, 46, 0.7)' }}></div>
+                                </div>
+                            )}
+
                             {isStarting && (
                                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900/50">
                                     <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin mb-2"></div>
@@ -128,13 +128,12 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                 #reader video {
-                     object-fit: cover !important;
-                     width: 100% !important;
+                 @keyframes scanBeam {
+                     0%, 100% { transform: translateY(0); }
+                     50% { transform: translateY(250px); }
                  }
-                 #qr-shaded-region {
-                     border-color: rgba(0,0,0,0.5) !important;
-                     border-width: 40px !important;
+                 .custom-scanner-beam {
+                     animation: scanBeam 2s ease-in-out infinite;
                  }
             `}} />
         </div>
