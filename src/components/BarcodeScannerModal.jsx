@@ -1,0 +1,144 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
+import { X, Camera } from 'lucide-react';
+
+const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
+    const scannerRef = useRef(null);
+    const [scanError, setScanError] = useState('');
+    const [isStarting, setIsStarting] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsStarting(true);
+
+            // Give the DOM a moment to render the container
+            const timer = setTimeout(() => {
+                scannerRef.current = new Html5Qrcode("reader");
+
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 100 },
+                    formatsToSupport: [
+                        window.Html5QrcodeSupportedFormats.EAN_13,
+                        window.Html5QrcodeSupportedFormats.EAN_8,
+                        window.Html5QrcodeSupportedFormats.CODE_128,
+                        window.Html5QrcodeSupportedFormats.CODE_39
+                    ]
+                };
+
+                // Request the back camera explicitly
+                scannerRef.current.start(
+                    { facingMode: "environment" },
+                    config,
+                    (decodedText, decodedResult) => {
+                        // Success Callback
+                        onScan(decodedText);
+                        handleClose();
+                    },
+                    (errorMessage) => {
+                        // Failure callback (happens constantly while scanning, ignore)
+                    }
+                ).then(() => {
+                    setIsStarting(false);
+                }).catch((err) => {
+                    setScanError("Failed to start camera. Please ensure permissions are granted.");
+                    setIsStarting(false);
+                    console.error("Camera start error:", err);
+                });
+
+            }, 100);
+
+            return () => {
+                clearTimeout(timer);
+                cleanupScanner();
+            };
+        }
+    }, [isOpen]);
+
+    const cleanupScanner = async () => {
+        if (scannerRef.current && scannerRef.current.isScanning) {
+            try {
+                await scannerRef.current.stop();
+                scannerRef.current.clear();
+            } catch (error) {
+                console.error("Failed to clear html5QrcodeScanner. ", error);
+            }
+        }
+    };
+
+    const handleClose = async () => {
+        await cleanupScanner();
+        onClose();
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div className="flex items-center gap-2">
+                        <div className="bg-brand/10 p-2 rounded-xl">
+                            <Camera className="w-5 h-5 text-brand" />
+                        </div>
+                        <h2 className="text-lg font-bold text-gray-900">Scan Barcode</h2>
+                    </div>
+                    <button
+                        onClick={handleClose}
+                        className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors active:scale-95"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <div className="p-6">
+                    <div className="mb-4">
+                        <p className="text-sm font-medium text-gray-500 text-center mb-4">
+                            Point your camera at a barcode to scan it automatically.
+                        </p>
+
+                        {/* Container must have static position to work best with library */}
+                        <div className="relative w-full rounded-2xl overflow-hidden shadow-inner border border-gray-200 bg-black min-h-[250px] flex items-center justify-center">
+                            {isStarting && (
+                                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900/50">
+                                    <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin mb-2"></div>
+                                    <span className="text-white font-bold text-sm">Starting Camera...</span>
+                                </div>
+                            )}
+                            <div id="reader" className="w-full h-full"></div>
+                        </div>
+                    </div>
+
+                    {scanError && (
+                        <div className="text-red-500 text-sm font-bold text-center mt-2 bg-red-50 p-2 rounded-xl border border-red-100">
+                            {scanError}
+                        </div>
+                    )}
+                </div>
+
+                <div className="p-4 bg-gray-50/50 flex justify-center border-t border-gray-100">
+                    <button
+                        onClick={handleClose}
+                        className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl active:scale-95 shadow-sm"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                 #reader video {
+                     object-fit: cover !important;
+                     width: 100% !important;
+                 }
+                 #qr-shaded-region {
+                     border-color: rgba(0,0,0,0.5) !important;
+                     border-width: 40px !important;
+                 }
+            `}} />
+        </div>
+    );
+};
+
+export default BarcodeScannerModal;
