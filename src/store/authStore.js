@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import api from '../lib/axios';
 import { jwtDecode } from "jwt-decode";
+import { googleLogout } from '@react-oauth/google';
 
 const getInitialAuthState = () => {
     const token = localStorage.getItem('access_token');
@@ -35,6 +36,22 @@ const useAuthStore = create((set) => ({
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
+            const { access_token, refresh_token } = response.data;
+            localStorage.setItem('access_token', access_token);
+            localStorage.setItem('refresh_token', refresh_token);
+
+            const decodedUser = jwtDecode(access_token);
+            set({ user: decodedUser, isAuthenticated: true, isLoading: false });
+            return true;
+        } catch (error) {
+            set({ isLoading: false });
+            throw error;
+        }
+    },
+    loginWithGoogle: async (token) => {
+        set({ isLoading: true });
+        try {
+            const response = await api.post('/auth/google', { token });
             const { access_token, refresh_token } = response.data;
             localStorage.setItem('access_token', access_token);
             localStorage.setItem('refresh_token', refresh_token);
@@ -89,6 +106,7 @@ const useAuthStore = create((set) => ({
     },
 
     logout: () => {
+        googleLogout();
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         set({ user: null, userProfile: null, isAuthenticated: false });

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Store, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import useAuthStore from '../store/authStore';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -9,7 +10,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { login, isLoading } = useAuthStore();
+    const { login, loginWithGoogle, isLoading } = useAuthStore();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -134,6 +135,32 @@ const Login = () => {
                             </span>
                         </button>
                     </form>
+
+                    <div className="mt-6 flex flex-col gap-4">
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-200"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-gray-500 font-medium">Or continue with</span>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                            <GoogleLogin
+                                onSuccess={credentialResponse => {
+                                    loginWithGoogle(credentialResponse.credential)
+                                        .then(() => navigate('/dashboard'))
+                                        .catch(err => setError(err.response?.data?.detail || 'Google Login failed.'));
+                                }}
+                                onError={() => {
+                                    setError('Google Login Failed');
+                                }}
+                                useOneTap
+                                useFedCmForPrompt={true}
+                            />
+                        </div>
+                    </div>
 
                     <p className="mt-10 text-center text-gray-600 font-medium text-lg">
                         Don't have an account? <Link to="/signup" className="text-brand font-bold hover:text-primary-700 ml-1 transition-colors">Sign up for free</Link>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Store, Mail, Eye, EyeOff, User, ArrowLeft } from 'lucide-react';
 import useAuthStore from '../store/authStore';
+import { GoogleLogin } from '@react-oauth/google';
 
 const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -12,7 +13,7 @@ const SignUp = () => {
     const [error, setError] = useState('');
 
     const navigate = useNavigate();
-    const { register, isLoading } = useAuthStore();
+    const { register, loginWithGoogle, isLoading } = useAuthStore();
 
     const handleSignUp = async (e) => {
         e.preventDefault();
@@ -171,9 +172,44 @@ const SignUp = () => {
                         </button>
                     </form>
 
+                    <div className="mt-8 flex flex-col gap-4">
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-200"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-gray-500 font-medium">Or continue with</span>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                            <GoogleLogin
+                                onSuccess={credentialResponse => {
+                                    loginWithGoogle(credentialResponse.credential)
+                                        .then(() => navigate('/dashboard'))
+                                        .catch(err => setError(err.response?.data?.detail || 'Google Login failed.'));
+                                }}
+                                onError={() => {
+                                    setError('Google Login Failed');
+                                }}
+                                useOneTap
+                                useFedCmForPrompt={true}
+                            />
+                        </div>
+                    </div>
+
                     <p className="mt-10 text-center text-gray-600 font-medium text-lg">
                         Already have an account? <Link to="/login" className="text-brand font-bold hover:text-primary-700 ml-1 transition-colors">Log In here</Link>
                     </p>
+
+                    <div className="mt-8 text-center text-sm text-gray-500 flex flex-col items-center gap-2">
+                        <p>By signing up, you agree to our</p>
+                        <div className="flex gap-4">
+                            <Link to="/terms-of-service" className="hover:text-brand transition-colors underline">Terms of Service</Link>
+                            <span>&middot;</span>
+                            <Link to="/privacy-policy" className="hover:text-brand transition-colors underline">Privacy Policy</Link>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

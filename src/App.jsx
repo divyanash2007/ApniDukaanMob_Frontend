@@ -10,6 +10,8 @@ import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import BottomNav from './components/BottomNav';
 import useAuthStore from './store/authStore';
+import PolicyPage from './pages/PolicyPage';
+import TermsOfService from './pages/TermsOfService';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -43,6 +45,8 @@ const App = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/privacy-policy" element={<PolicyPage />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
 
         {/* Protected Routes with Bottom Navigation */}
         <Route path="/dashboard" element={
