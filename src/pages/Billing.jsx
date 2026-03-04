@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Plus, Minus, Trash2, Printer, Receipt, ArrowLeft, MoreVertical, ScanLine, ShoppingCart, Box } from 'lucide-react';
+import { Search, Plus, Minus, Trash2, Printer, Receipt, ArrowLeft, MoreVertical, ScanLine, ShoppingCart, Box, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 import useBillingStore from '../store/billingStore';
 import SelectProductModal from '../components/SelectProductModal';
@@ -13,9 +14,23 @@ const Billing = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+    const [customerPhone, setCustomerPhone] = useState('');
 
     // Derived state
     const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+    // Handle External App Scan Return
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('scanned_barcode');
+        if (code) {
+            scanProduct(code);
+            // Remove the param without full reload
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }, [scanProduct]);
 
     useEffect(() => {
         if (products.length === 0) {
@@ -38,6 +53,12 @@ const Billing = () => {
 
     const handleShareWhatsApp = () => {
         if (cart.length === 0) return;
+        setIsPhoneModalOpen(true);
+    };
+
+    const handleConfirmWhatsAppShare = (e) => {
+        e.preventDefault();
+        if (!customerPhone) return;
 
         let message = `*🧾 Apna Dukaan Receipt*\n\n`;
         cart.forEach((item, idx) => {
@@ -47,8 +68,11 @@ const Billing = () => {
         message += `\n*Total Amount: ₹${totalAmount.toFixed(2)}*\n\n`;
         message += `Thank you for shopping!`;
 
-        const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        // Clean the number format if needed (e.g. remove spaces). Assuming they typed clean number or included '+'
+        const formattedPhone = customerPhone.replace(/\s+/g, '');
+        const url = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
+        setIsPhoneModalOpen(false);
     };
 
     const handleSearch = async (e) => {
@@ -61,9 +85,9 @@ const Billing = () => {
     const handleGenerateBill = async () => {
         try {
             await generateBill();
-            alert('Bill generated successfully!');
+            toast.success('Bill generated successfully!');
         } catch (err) {
-            alert('Failed to generate bill');
+            // Error toast handled by axios interceptor
         }
     };
 
@@ -243,6 +267,56 @@ const Billing = () => {
                 </div>
 
             </div>
+
+            {/* WhatsApp Phone Modal */}
+            {isPhoneModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 backdrop-blur-sm p-4 pb-8 sm:items-center print:hidden">
+                    <div className="bg-white w-full max-w-sm rounded-[32px] shadow-2xl overflow-hidden flex flex-col pt-2">
+                        <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-2 mb-4"></div>
+                        <div className="px-6 pb-2">
+                            <h3 className="font-extrabold text-xl text-gray-900 mb-1">WhatsApp Receipt</h3>
+                            <p className="text-sm font-medium text-gray-500 leading-snug">Enter customer's WhatsApp number.</p>
+                        </div>
+
+                        <div className="p-6 pt-4">
+                            <form onSubmit={handleConfirmWhatsAppShare} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">WhatsApp Number</label>
+                                    <div className="relative">
+                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="tel"
+                                            value={customerPhone}
+                                            onChange={(e) => setCustomerPhone(e.target.value)}
+                                            placeholder="e.g. +91 9876543210"
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-[#00C853] focus:border-[#00C853] focus:outline-none transition-all font-bold text-gray-900 placeholder-gray-400"
+                                            required
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 mt-2 font-medium">Include country code (e.g. +91) for best results.</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-100 mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsPhoneModalOpen(false)}
+                                        className="py-3.5 px-4 bg-gray-100 text-gray-700 font-bold rounded-xl active:scale-95 transition-transform"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={!customerPhone}
+                                        className="py-3.5 px-4 bg-[#00C853] text-white font-extrabold rounded-xl shadow-[0_4px_14px_rgba(0,200,83,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                                    >
+                                        Send
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Print Only Receipt Layout */}
             <div className="hidden print:block font-mono text-black p-4 text-xs">

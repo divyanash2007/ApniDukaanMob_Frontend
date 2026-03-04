@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { User, Mail, Store, LogOut, ChevronRight, Shield, Bell, CircleUserRound, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import useAuthStore from '../store/authStore';
 
 const Profile = () => {
@@ -136,7 +137,7 @@ const Profile = () => {
                 </div>
 
                 <div
-                    onClick={() => alert("Notification preferences coming soon!")}
+                    onClick={() => toast("Notification preferences coming soon!", { icon: '🚧' })}
                     className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition active:bg-gray-100"
                 >
                     <div className="flex items-center gap-4">

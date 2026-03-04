@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, ChevronDown, Plus, Edit2, Upload, Box, ArrowLeft, X, Save, ArrowUpDown, Trash2, CheckCircle2, Circle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import useProductStore from '../store/productStore';
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
 
@@ -27,6 +28,9 @@ const Inventory = () => {
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc', 'desc'
     const [isSortOpen, setIsSortOpen] = useState(false);
 
+    // Filtering State
+    const [showLowStockOnly, setShowLowStockOnly] = useState(false);
+
     // Multi-select State
     const [selectedItems, setSelectedItems] = useState(new Set());
     const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -39,6 +43,26 @@ const Inventory = () => {
         fetchProducts();
     }, [fetchProducts]);
 
+    // Handle External App Scan Return and Query Filters
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('scanned_barcode');
+        const filterStr = params.get('filter');
+
+        if (code) {
+            setSearchTerm(code);
+        }
+        if (filterStr === 'low_stock') {
+            setShowLowStockOnly(true);
+        }
+
+        if (code || filterStr) {
+            // Remove the param without full reload
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }, []);
+
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -46,9 +70,9 @@ const Inventory = () => {
         setUploading(true);
         try {
             await uploadBulkCSV(file);
-            alert('Upload successful');
+            toast.success('Upload successful');
         } catch (error) {
-            alert(error.response?.data?.detail || 'Upload failed');
+            // Handled by global axios interceptor
         } finally {
             setUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = ''; // Reset
@@ -72,7 +96,7 @@ const Inventory = () => {
             setEditingProduct(null);
         } catch (error) {
             console.error("Failed to update product:", error);
-            alert("Failed to update product. Please try again.");
+            // Error toast handled globally
         } finally {
             setIsSaving(false);
         }
@@ -95,7 +119,7 @@ const Inventory = () => {
             setNewProduct({ name: '', price: '', mrp: '', buying_price: '', stock: '', barcode: '' });
         } catch (error) {
             console.error("Failed to add product:", error);
-            alert(error || "Failed to add product. Please try again.");
+            // Error toast handled globally
         } finally {
             setIsAdding(false);
         }
@@ -169,7 +193,6 @@ const Inventory = () => {
             cancelSelection();
         } catch (error) {
             console.error("Failed to delete some items:", error);
-            alert("Failed to delete some items. Please check your connection and try again.");
             // Refresh explicitly just in case of partial success
             fetchProducts();
         } finally {
@@ -178,10 +201,12 @@ const Inventory = () => {
     };
     // ----------------------------
 
-    const filteredProducts = products.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.barcode.toLowerCase().includes(searchTerm.toLowerCase())
-    ).sort((a, b) => {
+    const filteredProducts = products.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.barcode.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesLowStock = showLowStockOnly ? p.stock < 5 : true;
+        return matchesSearch && matchesLowStock;
+    }).sort((a, b) => {
         let valA = a[sortBy];
         let valB = b[sortBy];
 
@@ -274,8 +299,11 @@ const Inventory = () => {
 
             {/* Filters */}
             <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide mb-2 -mx-4 px-4 relative">
-                <button className="flex items-center gap-1.5 whitespace-nowrap bg-white border border-gray-200 px-4 py-2 rounded-full text-sm font-bold text-gray-700 shadow-sm shrink-0">
-                    Low Stock <ChevronDown className="w-4 h-4 text-gray-400" />
+                <button
+                    onClick={() => setShowLowStockOnly(!showLowStockOnly)}
+                    className={`flex items-center gap-1.5 whitespace-nowrap border px-4 py-2 rounded-full text-sm font-bold shadow-sm shrink-0 transition-colors ${showLowStockOnly ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-white border-gray-200 text-gray-700'}`}
+                >
+                    Low Stock {showLowStockOnly ? <X className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
                 </button>
                 <div className="relative shrink-0">
                     <button
@@ -358,8 +386,8 @@ const Inventory = () => {
                                         <span className="font-extrabold text-sm text-gray-800">₹{product.price.toFixed(2)}</span>
                                     </div>
                                     <div className="flex gap-2 items-center">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 uppercase tracking-wider ${product.stock < 10 ? 'bg-orange-50 text-orange-600' : 'bg-primary-50 text-brand'}`}>
-                                            {product.stock < 10 ? 'Low Stock' : 'Stock'}: {product.stock}
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 uppercase tracking-wider ${product.stock < 5 ? 'bg-orange-50 text-orange-600' : 'bg-primary-50 text-brand'}`}>
+                                            {product.stock < 5 ? 'Low Stock' : 'Stock'}: {product.stock}
                                         </span>
                                         <span className="text-[10px] font-medium text-gray-400 uppercase">Code: {product.barcode}</span>
                                     </div>

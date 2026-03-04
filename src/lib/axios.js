@@ -1,4 +1,5 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
@@ -44,6 +45,24 @@ api.interceptors.response.use(
                 localStorage.removeItem('refresh_token');
                 window.location.href = '/login';
             }
+        } else if (error.response && error.response.status >= 400 && error.response.status !== 401) {
+            // Global error handler for all API errors EXCEPT 401s (handled above)
+            const errorData = error.response.data;
+            let errorMessage = "An unexpected error occurred.";
+
+            if (typeof errorData === 'string') {
+                errorMessage = errorData;
+            } else if (errorData && errorData.detail) {
+                errorMessage = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            // Show toast notification
+            toast.error(errorMessage);
+        } else if (!error.response) {
+            // Network error
+            toast.error("Network error. Please check your connection.");
         }
         return Promise.reject(error);
     }

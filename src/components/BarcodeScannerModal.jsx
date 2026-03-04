@@ -60,6 +60,18 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
         onClose();
     };
 
+    const handleExternalScan = () => {
+        // Build an Intent URL to open ZXing Barcode Scanner app
+        // The app will scan and return to the current URL with ?scanned_barcode=... appended
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('scanned_barcode', '{CODE}');
+        const returnUrl = encodeURIComponent(currentUrl.toString());
+        const intentUrl = `intent://scan/?ret=${returnUrl}#Intent;scheme=zxing;package=com.google.zxing.client.android;end`;
+
+        // Navigate
+        window.location.href = intentUrl;
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -112,7 +124,13 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
                     )}
                 </div>
 
-                <div className="p-4 bg-gray-50/50 flex justify-center border-t border-gray-100">
+                <div className="p-4 bg-gray-50/50 flex justify-between gap-3 border-t border-gray-100">
+                    <button
+                        onClick={handleExternalScan}
+                        className="px-4 py-2.5 bg-brand/10 text-brand font-bold rounded-xl active:scale-95 transition-transform flex-1"
+                    >
+                        Use External App
+                    </button>
                     <button
                         onClick={handleClose}
                         className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl active:scale-95 shadow-sm"

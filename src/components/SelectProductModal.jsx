@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, X, Box, Plus } from 'lucide-react';
 import useProductStore from '../store/productStore';
 
-const SelectProductModal = ({ isOpen, onClose, onSelect }) => {
+const SelectProductModal = ({ isOpen, onClose, onSelect, sortByStock = false }) => {
     const { products, fetchProducts, isLoading } = useProductStore();
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -14,10 +14,14 @@ const SelectProductModal = ({ isOpen, onClose, onSelect }) => {
 
     if (!isOpen) return null;
 
-    const filteredProducts = products.filter(p =>
+    let filteredProducts = products.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.barcode.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    if (sortByStock) {
+        filteredProducts = filteredProducts.sort((a, b) => a.stock - b.stock);
+    }
 
     return (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">

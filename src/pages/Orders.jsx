@@ -43,6 +43,18 @@ const Orders = () => {
         }
     }, [fetchLastOrder]);
 
+    // Handle External App Scan Return
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('scanned_barcode');
+        if (code) {
+            scanProductForOrder(code);
+            // Remove the param without full reload
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }, [scanProductForOrder]);
+
     const handleLoadLastOrder = () => {
         if (!lastOrder || !lastOrder.order_details) return;
 
@@ -77,7 +89,7 @@ const Orders = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-6">
+        <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-[320px]">
 
             {/* Header section */}
             <div className="flex justify-between items-center mb-6">
@@ -157,8 +169,16 @@ const Orders = () => {
                 </div>
             </div>
 
+            <button
+                onClick={() => setIsModalOpen(true)}
+                disabled={!isCustomizationMode}
+                className={`w-full border-2 border-dashed border-primary-200 bg-primary-50/50 text-brand font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm mb-6 transition-all ${!isCustomizationMode ? 'opacity-50 pointer-events-none' : 'hover:bg-primary-50 active:scale-95'}`}
+            >
+                <Search className="w-4 h-4" /> Add Item from Inventory
+            </button>
+
             {/* Scrollable order list */}
-            <div className="flex-1 overflow-y-auto mb-40">
+            <div className="flex-1 overflow-y-auto mb-4">
                 <div className="flex justify-between items-end mb-4">
                     <h3 className="font-extrabold text-gray-900">Current Order List</h3>
                     <span className="bg-primary-100 text-brand text-[10px] font-bold px-2.5 py-1 rounded-full">{orderItems.length} items</span>
@@ -201,20 +221,13 @@ const Orders = () => {
                         </div>
                     ))}
                 </div>
-
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    disabled={!isCustomizationMode}
-                    className={`w-full border-2 border-dashed border-primary-200 bg-primary-50/50 text-brand font-bold py-4 rounded-3xl flex items-center justify-center gap-2 text-sm mt-6 transition-all ${!isCustomizationMode ? 'opacity-50 pointer-events-none' : 'hover:bg-primary-50 active:scale-95'}`}
-                >
-                    <Plus className="w-4 h-4" /> Add Item from Inventory
-                </button>
             </div>
 
             <SelectProductModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSelect={(product) => scanProductForOrder(product.barcode || product.name)}
+                sortByStock={true}
             />
 
             <BarcodeScannerModal

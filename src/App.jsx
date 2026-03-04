@@ -12,6 +12,7 @@ import BottomNav from './components/BottomNav';
 import useAuthStore from './store/authStore';
 import PolicyPage from './pages/PolicyPage';
 import TermsOfService from './pages/TermsOfService';
+import { Toaster } from 'react-hot-toast';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -40,6 +41,26 @@ const App = () => {
 
   return (
     <Router>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: 'font-sans font-bold shadow-xl rounded-2xl p-4',
+          duration: 2000,
+          style: {
+            background: '#ffffff',
+            color: '#111827',
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+            style: {
+              borderLeft: '4px solid #ef4444'
+            }
+          }
+        }}
+      />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />

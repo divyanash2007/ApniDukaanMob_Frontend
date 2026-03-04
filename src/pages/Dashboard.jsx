@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, CreditCard, PackagePlus, Receipt, TrendingUp, AlertTriangle, ArrowRight, UserCircle2, ShoppingCart, PackageCheck, X, FileText, Send } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import useAuthStore from '../store/authStore';
 import api from '../lib/axios';
 
@@ -64,7 +65,7 @@ const Dashboard = () => {
             document.body.removeChild(link);
         } catch (error) {
             console.error("Failed to download report", error);
-            alert("Failed to download report. Please try again.");
+            // Handled by global axios interceptor
         }
     };
 
@@ -96,9 +97,10 @@ const Dashboard = () => {
             // Re-fetch stats to get updated stock value
             const response = await api.get('/stats/');
             setStats(response.data);
+            toast.success("Order marked as delivered");
         } catch (error) {
             console.error("Failed to mark order as delivered", error);
-            alert("Failed to mark order as delivered. Please try again.");
+            // Handled by global interceptor
         }
     };
 
@@ -179,7 +181,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Low Stock Card */}
-                <Link to="/inventory" className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
+                <Link to="/inventory?filter=low_stock" className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
                     <div className="flex justify-between items-start mb-4">
                         <div className="bg-orange-50 p-2.5 rounded-xl">
                             <PackagePlus className="w-5 h-5 text-orange-500" />
