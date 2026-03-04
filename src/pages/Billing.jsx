@@ -69,7 +69,7 @@ const Billing = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-6 print:hidden">
+            <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-[320px] print:hidden">
 
                 {/* Header section */}
                 <div className="flex justify-between items-center mb-6">

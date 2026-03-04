@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, ChevronDown, Plus, Edit2, Upload, Box, ArrowLeft, X, Save, ArrowUpDown } from 'lucide-react';
+import { Search, ChevronDown, Plus, Edit2, Upload, Box, ArrowLeft, X, Save, ArrowUpDown, Trash2, CheckCircle2, Circle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useProductStore from '../store/productStore';
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
 
 const Inventory = () => {
-    const { products, isLoading, fetchProducts, uploadBulkCSV, updateProduct, addProduct } = useProductStore();
+    const { products, isLoading, fetchProducts, uploadBulkCSV, updateProduct, addProduct, deleteProduct } = useProductStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [uploading, setUploading] = useState(false);
 
@@ -26,6 +26,12 @@ const Inventory = () => {
     const [sortBy, setSortBy] = useState('name'); // 'name', 'stock', 'price', 'mrp'
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc', 'desc'
     const [isSortOpen, setIsSortOpen] = useState(false);
+
+    // Multi-select State
+    const [selectedItems, setSelectedItems] = useState(new Set());
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+    const longPressTimerRef = useRef(null);
 
     const fileInputRef = useRef(null);
 
@@ -105,6 +111,73 @@ const Inventory = () => {
         setIsSortOpen(false);
     };
 
+    // --- Select & Delete Logic ---
+    const startPress = (product) => {
+        if (isSelectionMode) return;
+        longPressTimerRef.current = setTimeout(() => {
+            setIsSelectionMode(true);
+            toggleSelection(product.id);
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(50); // Small haptic feedback for long press
+            }
+        }, 500); // 500ms for long press
+    };
+
+    const clearPress = () => {
+        if (longPressTimerRef.current) {
+            clearTimeout(longPressTimerRef.current);
+            longPressTimerRef.current = null;
+        }
+    };
+
+    const toggleSelection = (productId) => {
+        setSelectedItems(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(productId)) {
+                newSet.delete(productId);
+            } else {
+                newSet.add(productId);
+            }
+            if (newSet.size === 0) {
+                setIsSelectionMode(false); // Auto exit selection mode if nothing selected
+            }
+            return newSet;
+        });
+    };
+
+    const handleItemClick = (product, e) => {
+        if (isSelectionMode) {
+            e.preventDefault();
+            toggleSelection(product.id);
+        }
+        // If not in selection mode, normal click happens (e.g., nothing here since Edit is a button overlay)
+    };
+
+    const cancelSelection = () => {
+        setIsSelectionMode(false);
+        setSelectedItems(new Set());
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedItems.size === 0) return;
+        if (!window.confirm(`Are you sure you want to delete ${selectedItems.size} items?`)) return;
+
+        setIsDeletingBulk(true);
+        try {
+            // Delete all selected items concurrently
+            await Promise.all(Array.from(selectedItems).map(id => deleteProduct(id)));
+            cancelSelection();
+        } catch (error) {
+            console.error("Failed to delete some items:", error);
+            alert("Failed to delete some items. Please check your connection and try again.");
+            // Refresh explicitly just in case of partial success
+            fetchProducts();
+        } finally {
+            setIsDeletingBulk(false);
+        }
+    };
+    // ----------------------------
+
     const filteredProducts = products.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.barcode.toLowerCase().includes(searchTerm.toLowerCase())
@@ -126,31 +199,56 @@ const Inventory = () => {
         <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-6 relative">
 
             {/* Header section */}
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                    <Link to="/dashboard" className="p-1 -ml-1">
-                        <ArrowLeft className="w-6 h-6 text-gray-700" />
-                    </Link>
-                    <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Inventory</h1>
-                </div>
-                <div className="flex items-center gap-2">
-                    <input
-                        type="file"
-                        accept=".csv"
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                        className="hidden"
-                    />
+            {isSelectionMode ? (
+                <div className="flex justify-between items-center mb-6 bg-brand/10 p-3 rounded-2xl border border-brand/20">
+                    <div className="flex items-center gap-3">
+                        <button onClick={cancelSelection} className="p-1 -ml-1 text-gray-500 hover:text-gray-900 transition">
+                            <X className="w-6 h-6" />
+                        </button>
+                        <h1 className="text-xl font-bold text-brand tracking-tight">
+                            {selectedItems.size} Selected
+                        </h1>
+                    </div>
                     <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
-                        className="flex items-center gap-1 border border-gray-200 bg-white px-3 py-1.5 rounded-lg shadow-sm text-sm font-bold text-gray-700 active:scale-95 disabled:opacity-50"
+                        onClick={handleBulkDelete}
+                        disabled={isDeletingBulk}
+                        className={`flex items-center gap-1.5 bg-red-500 text-white px-3 py-1.5 rounded-lg shadow-sm text-sm font-bold active:scale-95 transition ${isDeletingBulk ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-600'}`}
                     >
-                        {uploading ? <Box className="w-5 h-5 animate-pulse" /> : <Upload className="w-4 h-4" />}
-                        {uploading ? '...' : 'CSV'}
+                        {isDeletingBulk ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        ) : (
+                            <Trash2 className="w-4 h-4" />
+                        )}
+                        Delete
                     </button>
                 </div>
-            </div>
+            ) : (
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-3">
+                        <Link to="/dashboard" className="p-1 -ml-1">
+                            <ArrowLeft className="w-6 h-6 text-gray-700" />
+                        </Link>
+                        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Inventory</h1>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            className="hidden"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                            className="flex items-center gap-1 border border-gray-200 bg-white px-3 py-1.5 rounded-lg shadow-sm text-sm font-bold text-gray-700 active:scale-95 disabled:opacity-50"
+                        >
+                            {uploading ? <Box className="w-5 h-5 animate-pulse" /> : <Upload className="w-4 h-4" />}
+                            {uploading ? '...' : 'CSV'}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Search Bar */}
             <div className="relative mb-5">
@@ -223,36 +321,65 @@ const Inventory = () => {
                         <p className="text-xs text-gray-400 mt-1">Add items manually or via CSV.</p>
                     </div>
                 ) : (
-                    filteredProducts.map((product) => (
-                        <div key={product.id} className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 relative">
-                            {/* Product Image Thumb */}
-                            <div className="w-16 h-16 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl flex items-center justify-center shrink-0 border border-primary-200">
-                                <Box className="w-8 h-8 text-brand/60" />
-                            </div>
-
-                            {/* Product Details */}
-                            <div className="flex-1 min-w-0 pr-8">
-                                <h3 className="font-bold text-gray-900 truncate text-[15px] mb-0.5">{product.name}</h3>
-                                <div className="flex items-baseline gap-1.5 mb-1.5">
-                                    <span className="font-extrabold text-sm text-gray-800">₹{product.price.toFixed(2)}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 uppercase tracking-wider ${product.stock < 10 ? 'bg-orange-50 text-orange-600' : 'bg-primary-50 text-brand'}`}>
-                                        {product.stock < 10 ? 'Low Stock' : 'Stock'}: {product.stock}
-                                    </span>
-                                    <span className="text-[10px] font-medium text-gray-400 uppercase">Code: {product.barcode}</span>
-                                </div>
-                            </div>
-
-                            {/* Edit Button */}
-                            <button
-                                onClick={() => setEditingProduct({ ...product })}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-brand p-2 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors"
+                    filteredProducts.map((product) => {
+                        const isSelected = selectedItems.has(product.id);
+                        return (
+                            <div
+                                key={product.id}
+                                onMouseDown={() => startPress(product)}
+                                onMouseUp={clearPress}
+                                onMouseLeave={clearPress}
+                                onTouchStart={() => startPress(product)}
+                                onTouchEnd={clearPress}
+                                onTouchCancel={clearPress}
+                                onClick={(e) => handleItemClick(product, e)}
+                                className={`p-3 rounded-2xl shadow-sm border flex items-center gap-4 relative transition-colors ${isSelected ? 'bg-brand/10 border-brand' : 'bg-white border-gray-100'} ${isSelectionMode ? 'cursor-pointer' : ''}`}
                             >
-                                <Edit2 className="w-4 h-4" />
-                            </button>
-                        </div>
-                    ))
+                                {/* Selection Checkbox (visible in selection mode) */}
+                                {isSelectionMode && (
+                                    <div className="shrink-0 -mr-2">
+                                        {isSelected ? (
+                                            <CheckCircle2 className="w-6 h-6 text-brand" fill="currentColor" strokeWidth={1} />
+                                        ) : (
+                                            <Circle className="w-6 h-6 text-gray-300" strokeWidth={1.5} />
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Product Image Thumb */}
+                                <div className="w-16 h-16 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl flex items-center justify-center shrink-0 border border-primary-200 pointer-events-none">
+                                    <Box className="w-8 h-8 text-brand/60" />
+                                </div>
+
+                                {/* Product Details */}
+                                <div className="flex-1 min-w-0 pr-8 pointer-events-none">
+                                    <h3 className="font-bold text-gray-900 truncate text-[15px] mb-0.5">{product.name}</h3>
+                                    <div className="flex items-baseline gap-1.5 mb-1.5">
+                                        <span className="font-extrabold text-sm text-gray-800">₹{product.price.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex gap-2 items-center">
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 uppercase tracking-wider ${product.stock < 10 ? 'bg-orange-50 text-orange-600' : 'bg-primary-50 text-brand'}`}>
+                                            {product.stock < 10 ? 'Low Stock' : 'Stock'}: {product.stock}
+                                        </span>
+                                        <span className="text-[10px] font-medium text-gray-400 uppercase">Code: {product.barcode}</span>
+                                    </div>
+                                </div>
+
+                                {/* Edit Button - Hidden in selection mode to avoid misclicks */}
+                                {!isSelectionMode && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingProduct({ ...product });
+                                        }}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-brand p-2 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors"
+                                    >
+                                        <Edit2 className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+                        )
+                    })
                 )}
             </div>
 
@@ -340,13 +467,25 @@ const Inventory = () => {
                                         Barcode
                                         <span className="text-xs text-brand bg-primary-50 px-2 py-0.5 rounded uppercase">Unique</span>
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={editingProduct.barcode}
-                                        onChange={(e) => setEditingProduct({ ...editingProduct, barcode: e.target.value })}
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-brand focus:outline-none transition-shadow font-medium text-gray-500"
-                                        required
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            value={editingProduct.barcode}
+                                            onChange={(e) => setEditingProduct({ ...editingProduct, barcode: e.target.value })}
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-4 pr-12 focus:ring-2 focus:ring-brand focus:outline-none transition-shadow font-medium text-gray-500 text-sm"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setScanTarget('edit');
+                                                setIsScannerOpen(true);
+                                            }}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white border border-gray-200 text-brand p-1.5 rounded-lg active:scale-95"
+                                        >
+                                            <Box className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -537,6 +676,8 @@ const Inventory = () => {
                         setSearchTerm(decodedText);
                     } else if (scanTarget === 'add') {
                         setNewProduct({ ...newProduct, barcode: decodedText });
+                    } else if (scanTarget === 'edit') {
+                        setEditingProduct({ ...editingProduct, barcode: decodedText });
                     }
                 }}
             />
