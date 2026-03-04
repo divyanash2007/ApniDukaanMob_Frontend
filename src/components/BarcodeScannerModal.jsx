@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { BrowserMultiFormatReader } from '@zxing/library';
 import { X, Camera } from 'lucide-react';
 
 const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
@@ -7,32 +7,37 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
     const [scanError, setScanError] = useState('');
     const [isStarting, setIsStarting] = useState(false);
 
+    const cleanupScanner = () => {
+        if (scannerRef.current) {
+            try {
+                scannerRef.current.reset();
+            } catch (error) {
+                console.error("Failed to clear ZXing scanner. ", error);
+            }
+        }
+    };
+
     useEffect(() => {
         if (isOpen) {
             setIsStarting(true);
 
             // Give the DOM a moment to render the container
             const timer = setTimeout(() => {
-                scannerRef.current = new Html5Qrcode("reader");
+                const codeReader = new BrowserMultiFormatReader();
+                scannerRef.current = codeReader;
 
-                const config = {
-                    fps: 20
-                };
-
-                // Request the back camera explicitly
-                scannerRef.current.start(
-                    { facingMode: "environment" },
-                    config,
-                    (decodedText, decodedResult) => {
+                codeReader.decodeFromVideoDevice(undefined, 'video', (result, err) => {
+                    if (result) {
                         // Success Callback
-                        onScan(decodedText);
+                        onScan(result.getText());
                         handleClose();
-                    },
-                    (errorMessage) => {
-                        // Failure callback (happens constantly while scanning, ignore)
                     }
-                ).then(() => {
+                    if (err) {
+                        // Failure callback (happens constantly while scanning, ignore unless it's a real error)
+                    }
+                }).then(() => {
                     setIsStarting(false);
+                    // store controls if we need to stop later (though reset works on the reader)
                 }).catch((err) => {
                     setScanError("Failed to start camera. Please ensure permissions are granted.");
                     setIsStarting(false);
@@ -46,18 +51,9 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
                 cleanupScanner();
             };
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
 
-    const cleanupScanner = async () => {
-        if (scannerRef.current && scannerRef.current.isScanning) {
-            try {
-                await scannerRef.current.stop();
-                scannerRef.current.clear();
-            } catch (error) {
-                console.error("Failed to clear html5QrcodeScanner. ", error);
-            }
-        }
-    };
 
     const handleClose = async () => {
         await cleanupScanner();
@@ -105,7 +101,7 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
                                     <span className="text-white font-bold text-sm">Starting Camera...</span>
                                 </div>
                             )}
-                            <div id="reader" className="w-full h-full"></div>
+                            <video id="video" className="w-full h-full object-cover"></video>
                         </div>
                     </div>
 
