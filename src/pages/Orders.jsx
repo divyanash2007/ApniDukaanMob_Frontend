@@ -77,7 +77,7 @@ const Orders = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-[320px]">
+        <div className="min-h-screen bg-transparent flex flex-col font-sans px-4 pt-10 pb-[320px] relative z-10">
 
             {/* Header section */}
             <div className="flex justify-between items-center mb-6">
@@ -106,7 +106,7 @@ const Orders = () => {
                     onKeyDown={handleSearch}
                     disabled={isLoading}
                     placeholder="Search product or scan..."
-                    className="w-full bg-white border border-gray-200 shadow-sm rounded-2xl py-3.5 pl-12 pr-12 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition font-medium text-[15px] placeholder-gray-400 text-gray-900 disabled:opacity-50"
+                    className="w-full glass-input rounded-2xl py-3.5 pl-12 pr-12 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition font-medium text-[15px] placeholder-gray-500 text-gray-900 disabled:opacity-50"
                 />
                 <button
                     onClick={() => setIsScannerOpen(true)}
@@ -119,9 +119,9 @@ const Orders = () => {
             {error && <div className="text-red-500 text-sm font-bold text-center mb-4 bg-red-50 p-2 rounded-xl border border-red-100">{error}</div>}
 
             {/* Hero Action: Repeat Last Order */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-3xl mb-6 shadow-sm flex items-center justify-between">
+            <div className="clay-panel p-4 rounded-3xl mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 p-2.5 rounded-full text-blue-600 shrink-0">
+                    <div className="bg-blue-50/50 backdrop-blur-sm p-2.5 rounded-full text-blue-600 shrink-0 border border-white/50">
                         <RotateCcw className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 pr-2">
@@ -138,7 +138,7 @@ const Orders = () => {
                 <button
                     onClick={handleLoadLastOrder}
                     disabled={!lastOrder}
-                    className="shrink-0 bg-blue-600 text-white font-bold text-[11px] uppercase tracking-wider px-4 py-2 rounded-xl shadow-sm shadow-blue-600/20 active:scale-95 disabled:opacity-50 disabled:shadow-none"
+                    className="shrink-0 bg-blue-600 text-white font-bold text-[11px] uppercase tracking-wider px-4 py-2 rounded-xl clay-btn disabled:opacity-50 disabled:shadow-none"
                 >
                     Load
                 </button>
@@ -182,8 +182,8 @@ const Orders = () => {
                             <p className="text-xs text-gray-400 mt-1">Search or scan items above</p>
                         </div>
                     ) : orderItems.map((item, idx) => (
-                        <div key={item.barcode || idx} className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-3.5 flex items-center gap-3 relative">
-                            <div className="w-14 h-14 bg-primary-50 rounded-xl flex items-center justify-center p-2 shrink-0 border border-primary-100">
+                        <div key={item.barcode || idx} className="clay-panel rounded-[24px] p-3.5 flex items-center gap-3 relative">
+                            <div className="w-14 h-14 bg-white/40 backdrop-blur-sm rounded-xl flex items-center justify-center p-2 shrink-0 border border-white/50">
                                 <Tag className="w-6 h-6 text-brand" />
                             </div>
                             <div className="flex-1 min-w-0 pr-2">
@@ -230,7 +230,7 @@ const Orders = () => {
             />
 
             {/* Persistent Bottom Order Summary */}
-            <div className="bg-white p-5 rounded-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border border-gray-100 fixed bottom-[100px] left-4 right-4 z-40">
+            <div className="glass-nav rounded-[32px] fixed bottom-[100px] left-4 right-4 z-40 p-5">
                 <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-bold text-gray-500 tracking-wide">Total Items</span>
                     <span className="text-sm font-extrabold text-gray-900">{totalCases} cases</span>
@@ -244,7 +244,7 @@ const Orders = () => {
                 <button
                     onClick={() => setIsDistributorModalOpen(true)}
                     disabled={orderItems.length === 0}
-                    className="w-full bg-[#00C853] text-white font-extrabold text-base py-4 rounded-2xl shadow-[0_8px_20px_rgba(0,200,83,0.3)] hover:shadow-[0_8px_25px_rgba(0,200,83,0.5)] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:shadow-none"
+                    className="w-full bg-[#00C853] text-white font-extrabold text-base py-4 rounded-2xl clay-btn flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none"
                 >
                     <MessageCircle className="w-5 h-5 fill-current" /> Send Order to WhatsApp
                 </button>
@@ -309,7 +309,7 @@ const Orders = () => {
                                     <button
                                         type="submit"
                                         disabled={isLoading || !selectedDistributor.phone}
-                                        className="py-3.5 px-4 bg-[#00C853] text-white font-extrabold rounded-xl shadow-[0_4px_14px_rgba(0,200,83,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                                        className="py-3.5 px-4 bg-[#00C853] text-white font-extrabold rounded-xl clay-btn flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none"
                                     >
                                         {isLoading ? 'Sending...' : 'Send WhatsApp'}
                                     </button>

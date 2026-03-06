@@ -64,8 +64,8 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <div className="glass rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col border border-white/40">
+                <div className="p-4 border-b border-white/40 flex justify-between items-center bg-white/30">
                     <div className="flex items-center gap-2">
                         <div className="bg-brand/10 p-2 rounded-xl">
                             <Camera className="w-5 h-5 text-brand" />
@@ -112,10 +112,10 @@ const BarcodeScannerModal = ({ isOpen, onClose, onScan }) => {
                     )}
                 </div>
 
-                <div className="p-4 bg-gray-50/50 flex justify-center border-t border-gray-100">
+                <div className="p-4 border-t border-white/40 bg-white/30 flex justify-center">
                     <button
                         onClick={handleClose}
-                        className="px-6 py-2.5 w-full bg-white border border-gray-200 text-gray-700 font-bold rounded-xl active:scale-95 shadow-sm"
+                        className="px-6 py-2.5 w-full glass-panel text-gray-800 font-bold rounded-xl active:scale-95 shadow-sm"
                     >
                         Cancel
                     </button>

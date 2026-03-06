@@ -81,7 +81,7 @@ const Billing = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-[320px] print:hidden">
+            <div className="min-h-screen bg-transparent flex flex-col font-sans px-4 pt-10 pb-[320px] print:hidden relative z-10">
 
                 {/* Header section */}
                 <div className="flex justify-between items-center mb-6">
@@ -110,7 +110,7 @@ const Billing = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyDown={handleSearch}
                         placeholder="Scan barcode or type and press Enter"
-                        className="w-full bg-white border-2 border-brand/20 shadow-sm rounded-2xl py-4 pl-14 pr-12 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition font-medium text-[15px] placeholder-brand/60"
+                        className="w-full glass-input rounded-2xl py-4 pl-14 pr-12 text-[15px] placeholder-gray-500 font-bold"
                     />
                     <button
                         onClick={() => handleSearch({ key: 'Enter' })}
@@ -165,7 +165,7 @@ const Billing = () => {
                         <button onClick={clearCart} className="text-[10px] font-bold text-red-500 uppercase tracking-wider pr-1 active:scale-95">Clear All</button>
                     </div>
 
-                    <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 flex-1 overflow-y-auto overflow-hidden divide-y divide-gray-50 flex flex-col">
+                    <div className="glass rounded-[24px] flex-1 overflow-y-auto overflow-hidden divide-y divide-white/20 flex flex-col pt-2">
                         {cart.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
                                 <ShoppingCart className="w-10 h-10 mb-2 opacity-30 mx-auto" strokeWidth={1.5} />
@@ -174,7 +174,7 @@ const Billing = () => {
                             </div>
                         ) : cart.map((item, idx) => (
                             <div key={item.barcode || idx} className="p-4 flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-xl shrink-0 bg-primary-50 flex items-center justify-center border border-primary-100">
+                                <div className="w-12 h-12 rounded-xl shrink-0 bg-white/40 backdrop-blur-sm border border-white/50 flex items-center justify-center">
                                     <Box className="w-6 h-6 text-brand" />
                                 </div>
                                 <div className="flex-1 min-w-0 pr-2">
@@ -222,7 +222,7 @@ const Billing = () => {
                 />
 
                 {/* Persistent Bottom Checkout Summary */}
-                <div className="bg-white p-5 rounded-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border border-gray-100 fixed bottom-[100px] left-4 right-4 z-40">
+                <div className="glass-nav rounded-[32px] fixed bottom-[100px] left-4 right-4 z-40 p-5">
                     <div className="flex justify-between items-center mb-1">
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Subtotal</span>
                         <span className="text-sm font-extrabold text-gray-900">₹{totalAmount.toFixed(2)}</span>
@@ -242,7 +242,7 @@ const Billing = () => {
                         <button
                             onClick={handleGenerateBill}
                             disabled={cart.length === 0 || isLoading}
-                            className="flex-1 bg-brand text-white font-bold text-lg py-4 rounded-2xl shadow-[0_8px_20px_rgba(0,209,46,0.2)] hover:shadow-[0_8px_25px_rgba(0,209,46,0.4)] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:shadow-none"
+                            className="flex-1 bg-brand text-white font-bold text-lg py-4 rounded-2xl clay-btn flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none"
                         >
                             {isLoading ? 'Processing...' : 'Generate Bill'} <Receipt className="w-5 h-5 ml-1" />
                         </button>
@@ -298,7 +298,7 @@ const Billing = () => {
                                     <button
                                         type="submit"
                                         disabled={!customerPhone}
-                                        className="py-3.5 px-4 bg-[#00C853] text-white font-extrabold rounded-xl shadow-[0_4px_14px_rgba(0,200,83,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                                        className="py-3.5 px-4 bg-[#00C853] text-white font-extrabold rounded-xl clay-btn flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none"
                                     >
                                         Send
                                     </button>

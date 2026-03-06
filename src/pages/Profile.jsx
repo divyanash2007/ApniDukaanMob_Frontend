@@ -76,17 +76,15 @@ const Profile = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-6 relative">
+        <div className="min-h-screen bg-transparent flex flex-col font-sans px-4 pt-10 pb-6 relative z-10">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Profile</h1>
             </div>
 
             {/* Profile Card */}
-            <div className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 flex flex-col items-center mb-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-brand to-primary-600"></div>
-
-                <div className="w-24 h-24 bg-white rounded-full p-1.5 z-10 mt-6 shadow-md border border-gray-100">
+            <div className="clay-panel p-6 rounded-[32px] flex flex-col items-center mb-6">
+                <div className="w-24 h-24 bg-white/50 backdrop-blur-md rounded-full p-1.5 z-10 shadow-md border border-white/60">
                     <div className="w-full h-full bg-primary-50 rounded-full flex items-center justify-center text-brand">
                         <CircleUserRound className="w-12 h-12" />
                     </div>
@@ -102,14 +100,14 @@ const Profile = () => {
             </div>
 
             {/* Settings List */}
-            <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-50 mb-6">
+            <div className="clay-panel rounded-[32px] overflow-hidden divide-y divide-white/20 mb-6">
 
                 <div
                     onClick={handleOpenShopModal}
-                    className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition active:bg-gray-100"
+                    className="p-5 flex items-center justify-between cursor-pointer hover:bg-white/60 transition active:bg-white/40"
                 >
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-blue-50/50 backdrop-blur-sm border border-white/50 text-blue-500 rounded-xl flex items-center justify-center">
                             <Store className="w-5 h-5" />
                         </div>
                         <div>
@@ -122,10 +120,10 @@ const Profile = () => {
 
                 <div
                     onClick={handleOpenSecurityModal}
-                    className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition active:bg-gray-100"
+                    className="p-5 flex items-center justify-between cursor-pointer hover:bg-white/60 transition active:bg-white/40"
                 >
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-purple-50/50 backdrop-blur-sm border border-white/50 text-purple-500 rounded-xl flex items-center justify-center">
                             <Shield className="w-5 h-5" />
                         </div>
                         <div>
@@ -138,10 +136,10 @@ const Profile = () => {
 
                 <div
                     onClick={() => toast("Notification preferences coming soon!", { icon: '🚧' })}
-                    className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition active:bg-gray-100"
+                    className="p-5 flex items-center justify-between cursor-pointer hover:bg-white/60 transition active:bg-white/40"
                 >
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-orange-50/50 backdrop-blur-sm border border-white/50 text-orange-500 rounded-xl flex items-center justify-center">
                             <Bell className="w-5 h-5" />
                         </div>
                         <div>
@@ -157,7 +155,7 @@ const Profile = () => {
             {/* Logout */}
             <button
                 onClick={handleLogout}
-                className="mt-2 text-red-500 bg-red-50 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-[15px] hover:bg-red-100 active:scale-95 transition-all w-full border border-red-100"
+                className="mt-2 text-red-500 clay-panel clay-btn font-bold py-4 rounded-[24px] flex items-center justify-center gap-2 text-[15px] hover:bg-white/60 active:scale-95 transition-all w-full border border-red-500/20"
             >
                 <LogOut className="w-5 h-5" /> Log Out
             </button>
@@ -203,7 +201,7 @@ const Profile = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-brand text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 active:scale-95 transition-transform mt-4 disabled:opacity-50"
+                                className="w-full bg-brand text-white font-bold py-3.5 rounded-xl clay-btn mt-4 disabled:opacity-50"
                             >
                                 {isLoading ? 'Saving...' : 'Save Changes'}
                             </button>
@@ -262,7 +260,7 @@ const Profile = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-brand text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand/30 active:scale-95 transition-transform mt-4 disabled:opacity-50"
+                                className="w-full bg-brand text-white font-bold py-3.5 rounded-xl clay-btn mt-4 disabled:opacity-50"
                             >
                                 {isLoading ? 'Updating...' : 'Update Password'}
                             </button>

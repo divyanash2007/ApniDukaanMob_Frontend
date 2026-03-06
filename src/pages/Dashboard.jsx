@@ -105,7 +105,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans px-4 pt-10 pb-6">
+        <div className="min-h-screen bg-transparent font-sans px-4 pt-10 pb-6 relative z-10">
 
             {/* Header section with Shop Profile */}
             <div className="flex justify-between items-center mb-8">
@@ -134,9 +134,9 @@ const Dashboard = () => {
             {/* Overview Cards */}
             <div className="grid grid-cols-2 gap-4 mb-4">
                 {/* Today's Sales Card */}
-                <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div className="clay-panel p-5 rounded-3xl flex flex-col justify-between">
                     <div className="flex justify-between items-start mb-4">
-                        <div className="bg-primary-50 p-2.5 rounded-xl">
+                        <div className="bg-primary-50/50 backdrop-blur-sm p-2.5 rounded-xl border border-white/50">
                             <CreditCard className="w-5 h-5 text-brand" />
                         </div>
                     </div>
@@ -149,9 +149,9 @@ const Dashboard = () => {
                 </div>
 
                 {/* Monthly Sales Card */}
-                <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div className="clay-panel p-5 rounded-3xl flex flex-col justify-between">
                     <div className="flex justify-between items-start mb-4">
-                        <div className="bg-blue-50 p-2.5 rounded-xl">
+                        <div className="bg-blue-50/50 backdrop-blur-sm p-2.5 rounded-xl border border-white/50">
                             <TrendingUp className="w-5 h-5 text-blue-500" />
                         </div>
                     </div>
@@ -166,9 +166,9 @@ const Dashboard = () => {
 
             <div className="grid grid-cols-2 gap-4 mb-8">
                 {/* Stock Value Card */}
-                <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div className="clay-panel p-5 rounded-3xl flex flex-col justify-between">
                     <div className="flex justify-between items-start mb-4">
-                        <div className="bg-purple-50 p-2.5 rounded-xl">
+                        <div className="bg-purple-50/50 backdrop-blur-sm p-2.5 rounded-xl border border-white/50">
                             <PackageCheck className="w-5 h-5 text-purple-500" />
                         </div>
                     </div>
@@ -181,9 +181,9 @@ const Dashboard = () => {
                 </div>
 
                 {/* Low Stock Card */}
-                <Link to="/inventory?filter=low_stock" className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition">
+                <Link to="/inventory?filter=low_stock" className="clay-panel p-5 rounded-3xl flex flex-col justify-between hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition">
                     <div className="flex justify-between items-start mb-4">
-                        <div className="bg-orange-50 p-2.5 rounded-xl">
+                        <div className="bg-orange-50/50 backdrop-blur-sm p-2.5 rounded-xl border border-white/50">
                             <PackagePlus className="w-5 h-5 text-orange-500" />
                         </div>
                         {stats.low_stock_products > 0 && (
@@ -226,8 +226,8 @@ const Dashboard = () => {
                         </div>
                     </Link>
 
-                    <button onClick={downloadReport} className="col-span-2 bg-white p-5 rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col text-left group">
-                        <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center mb-6 z-10">
+                    <button onClick={downloadReport} className="col-span-2 clay-panel p-5 rounded-3xl hover:-translate-y-1 transition-all relative overflow-hidden flex flex-col text-left group">
+                        <div className="w-10 h-10 bg-primary-50/50 border border-white/50 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6 z-10">
                             <TrendingUp className="w-5 h-5 text-brand" />
                         </div>
                         <div className="z-10 mt-auto">
@@ -254,9 +254,9 @@ const Dashboard = () => {
                             <button
                                 key={sale.id}
                                 onClick={() => setSelectedSale(sale)}
-                                className="w-full text-left bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4 hover:bg-gray-50 transition"
+                                className="w-full text-left clay-panel p-4 rounded-3xl flex items-center gap-4 hover:bg-white/60 transition"
                             >
-                                <div className="bg-blue-50 p-3 rounded-2xl w-12 h-12 flex items-center justify-center shrink-0">
+                                <div className="bg-blue-50/50 backdrop-blur-sm border border-white/50 p-3 rounded-2xl w-12 h-12 flex items-center justify-center shrink-0">
                                     <Receipt className="w-5 h-5 text-blue-500" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -313,9 +313,9 @@ const Dashboard = () => {
 
             {/* Recent Sale Details Modal */}
             {selectedSale && (
-                <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                    <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 sticky top-0 z-10">
+                <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-md p-4">
+                    <div className="clay-panel w-full max-w-md rounded-3xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-4 border-b border-white/40 flex justify-between items-center bg-white/30 sticky top-0 z-10">
                             <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
                                 <Receipt className="w-5 h-5 text-gray-500" />
                                 Order #{selectedSale.id} Details
@@ -358,10 +358,10 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        <div className="p-4 border-t border-gray-100 bg-gray-50 grid grid-cols-2 gap-3 sticky bottom-0">
+                        <div className="p-4 border-t border-white/40 bg-white/30 grid grid-cols-2 gap-3 sticky bottom-0">
                             <button
                                 onClick={() => setSelectedSale(null)}
-                                className="py-3 px-4 bg-white border border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-50 transition"
+                                className="py-3 px-4 clay-panel text-gray-700 font-bold rounded-2xl hover:bg-white/60 transition"
                             >
                                 Close
                             </button>

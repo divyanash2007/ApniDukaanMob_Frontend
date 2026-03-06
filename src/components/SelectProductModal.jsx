@@ -102,11 +102,11 @@ const SelectProductModal = ({ isOpen, onClose, onSelect, onSelectMultiple, sortB
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
-            <div className="bg-white w-full sm:max-w-md h-[80vh] sm:h-[600px] rounded-t-[32px] sm:rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-slide-up sm:animate-fade-in relative">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-md p-0 sm:p-4">
+            <div className="glass w-full sm:max-w-md h-[80vh] sm:h-[600px] rounded-t-[32px] sm:rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-slide-up sm:animate-fade-in relative border border-white/40">
 
                 {/* Header */}
-                <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-10 sticky top-0 transition-colors duration-200">
+                <div className="px-6 py-5 border-b border-white/40 flex justify-between items-center bg-white/30 z-10 sticky top-0 transition-colors duration-200">
                     {isSelectionMode ? (
                         <div className="flex items-center gap-3 w-full">
                             <button onClick={cancelSelection} className="p-1 -ml-1 text-gray-500 hover:text-gray-900 transition outline-none">
@@ -131,7 +131,7 @@ const SelectProductModal = ({ isOpen, onClose, onSelect, onSelectMultiple, sortB
 
                 {/* Search Bar - hidden in selection mode for cleaner UI */}
                 {!isSelectionMode && (
-                    <div className="p-4 bg-gray-50 border-b border-gray-100">
+                    <div className="p-4 bg-white/20 border-b border-white/40">
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand w-5 h-5 pointer-events-none" />
                             <input
@@ -139,7 +139,7 @@ const SelectProductModal = ({ isOpen, onClose, onSelect, onSelectMultiple, sortB
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Search by name or barcode... (Long press to multiselect)"
-                                className="w-full bg-white border border-gray-200 shadow-sm rounded-2xl py-3 pl-12 pr-4 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition font-medium text-[15px] placeholder-gray-400"
+                                className="w-full glass-input rounded-2xl py-3 pl-12 pr-4 text-[15px] placeholder-gray-500 font-bold"
                                 autoFocus
                             />
                         </div>
@@ -170,7 +170,7 @@ const SelectProductModal = ({ isOpen, onClose, onSelect, onSelectMultiple, sortB
                                     onTouchEnd={clearPress}
                                     onTouchCancel={clearPress}
                                     onClick={(e) => handleItemClick(product, e)}
-                                    className={`p-3 rounded-2xl shadow-sm border flex items-center gap-4 cursor-pointer transition-all group ${isSelected ? 'bg-brand/10 border-brand' : 'bg-white border-gray-100 hover:border-brand/40 active:bg-primary-50'}`}
+                                    className={`p-3 rounded-2xl flex items-center gap-4 cursor-pointer transition-all group ${isSelected ? 'bg-brand/20 border border-brand' : 'glass-panel hover:border-brand/40 active:bg-white/40'}`}
                                 >
                                     {isSelectionMode && (
                                         <div className="shrink-0 -mr-2">
@@ -182,8 +182,8 @@ const SelectProductModal = ({ isOpen, onClose, onSelect, onSelectMultiple, sortB
                                         </div>
                                     )}
 
-                                    <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center shrink-0 border border-primary-100 pointer-events-none">
-                                        <Box className="w-6 h-6 text-brand/60" />
+                                    <div className="w-12 h-12 bg-white/40 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-white/50 pointer-events-none">
+                                        <Box className="w-6 h-6 text-brand/80" />
                                     </div>
 
                                     <div className="flex-1 min-w-0 pointer-events-none">
@@ -207,7 +207,7 @@ const SelectProductModal = ({ isOpen, onClose, onSelect, onSelectMultiple, sortB
 
                 {/* Sticky Selection Action Bar */}
                 {isSelectionMode && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] animate-slide-up z-20">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/40 glass-nav animate-slide-up z-20">
                         <button
                             onClick={handleAddSelected}
                             className="w-full bg-brand text-white font-bold py-3.5 rounded-2xl shadow-[0_8px_20px_rgba(0,209,46,0.3)] hover:shadow-[0_8px_25px_rgba(0,209,46,0.5)] transition-all flex items-center justify-center gap-2 active:scale-95"

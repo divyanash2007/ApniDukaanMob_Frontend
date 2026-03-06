@@ -214,7 +214,7 @@ const Inventory = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans px-4 pt-10 pb-6 relative">
+        <div className="min-h-screen bg-transparent flex flex-col font-sans px-4 pt-10 pb-6 relative z-10">
 
             {/* Header section */}
             {isSelectionMode ? (
@@ -276,7 +276,7 @@ const Inventory = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search products by name or barcode"
-                    className="w-full bg-white border border-gray-200 shadow-sm rounded-2xl py-3.5 pl-12 pr-12 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition font-medium text-[15px] placeholder-gray-400"
+                    className="w-full glass-input rounded-2xl py-3.5 pl-12 pr-12 text-[15px] placeholder-gray-500 font-bold"
                 />
                 <button
                     onClick={() => {
@@ -354,7 +354,7 @@ const Inventory = () => {
                                 onTouchEnd={clearPress}
                                 onTouchCancel={clearPress}
                                 onClick={(e) => handleItemClick(product, e)}
-                                className={`p-3 rounded-2xl shadow-sm border flex items-center gap-4 relative transition-colors ${isSelected ? 'bg-brand/10 border-brand' : 'bg-white border-gray-100'} ${isSelectionMode ? 'cursor-pointer' : ''}`}
+                                className={`p-3 rounded-2xl flex items-center gap-4 relative transition-colors ${isSelected ? 'bg-brand/20 border border-brand' : 'glass-panel'} ${isSelectionMode ? 'cursor-pointer' : ''}`}
                             >
                                 {/* Selection Checkbox (visible in selection mode) */}
                                 {isSelectionMode && (
@@ -368,8 +368,8 @@ const Inventory = () => {
                                 )}
 
                                 {/* Product Image Thumb */}
-                                <div className="w-16 h-16 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl flex items-center justify-center shrink-0 border border-primary-200 pointer-events-none">
-                                    <Box className="w-8 h-8 text-brand/60" />
+                                <div className="w-16 h-16 bg-white/40 backdrop-blur-sm rounded-xl flex items-center justify-center shrink-0 border border-white/50 pointer-events-none">
+                                    <Box className="w-8 h-8 text-brand/80" />
                                 </div>
 
                                 {/* Product Details */}

@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
 // Layout component for pages that need the bottom navigation
 const AppLayout = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 pb-[80px]">
+    <div className="flex flex-col min-h-screen bg-transparent pb-[80px]">
       <div className="flex-1">
         {children}
       </div>

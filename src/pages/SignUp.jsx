@@ -32,7 +32,7 @@ const SignUp = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex font-sans">
+        <div className="min-h-screen bg-transparent flex font-sans">
             {/* Left Side: Image Banner (Desktop Only) */}
             <div className="hidden lg:flex lg:w-1/2 relative bg-brand">
                 <div
@@ -60,8 +60,8 @@ const SignUp = () => {
             </div>
 
             {/* Right Side: Form */}
-            <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-12 bg-white relative">
-                <Link to="/" className="absolute top-8 left-6 sm:left-12 lg:left-24 text-gray-500 hover:text-gray-900 transition flex items-center gap-2 font-medium">
+            <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-12 bg-transparent relative z-10 backdrop-blur-md">
+                <Link to="/" className="absolute top-8 left-6 sm:left-12 lg:left-24 text-gray-600 hover:text-gray-900 transition flex items-center gap-2 font-bold">
                     <ArrowLeft className="w-5 h-5" />
                     <span>Back to Home</span>
                 </Link>
@@ -94,7 +94,7 @@ const SignUp = () => {
                                     value={shopName}
                                     onChange={(e) => setShopName(e.target.value)}
                                     placeholder="Green Valley Grocers"
-                                    className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all placeholder-gray-400 font-medium text-gray-900 pr-12 group-hover:border-gray-300"
+                                    className="w-full px-5 py-4 glass-input rounded-2xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all placeholder-gray-500 font-bold text-gray-900 pr-12"
                                     required
                                 />
                                 <Store className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none group-focus-within:text-brand transition-colors" />
@@ -109,7 +109,7 @@ const SignUp = () => {
                                     value={userName}
                                     onChange={(e) => setUserName(e.target.value)}
                                     placeholder="Alex M."
-                                    className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all placeholder-gray-400 font-medium text-gray-900 pr-12 group-hover:border-gray-300"
+                                    className="w-full px-5 py-4 glass-input rounded-2xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all placeholder-gray-500 font-bold text-gray-900 pr-12"
                                     required
                                 />
                                 <User className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none group-focus-within:text-brand transition-colors" />
@@ -124,7 +124,7 @@ const SignUp = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="shopkeeper@example.com"
-                                    className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all placeholder-gray-400 font-medium text-gray-900 pr-12 group-hover:border-gray-300"
+                                    className="w-full px-5 py-4 glass-input rounded-2xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all placeholder-gray-500 font-bold text-gray-900 pr-12"
                                     required
                                 />
                                 <Mail className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none group-focus-within:text-brand transition-colors" />
@@ -139,7 +139,7 @@ const SignUp = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Create a strong password"
-                                    className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all placeholder-gray-400 font-medium text-gray-900 pr-12 group-hover:border-gray-300"
+                                    className="w-full px-5 py-4 glass-input rounded-2xl focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all placeholder-gray-500 font-bold text-gray-900 pr-12"
                                     required
                                     minLength={8}
                                 />
@@ -156,7 +156,7 @@ const SignUp = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-brand text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-brand/25 hover:shadow-brand/40 hover:-translate-y-0.5 transition-all mt-8 active:scale-[0.98] disabled:opacity-70 disabled:hover:translate-y-0 relative overflow-hidden group"
+                            className="w-full bg-brand text-white font-bold text-lg py-4 rounded-2xl clay-btn mt-8 disabled:opacity-70 disabled:hover:translate-y-0 relative overflow-hidden group"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2">
                                 {isLoading ? (
