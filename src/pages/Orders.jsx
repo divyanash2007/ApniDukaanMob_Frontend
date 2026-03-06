@@ -43,18 +43,6 @@ const Orders = () => {
         }
     }, [fetchLastOrder]);
 
-    // Handle External App Scan Return
-    React.useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('scanned_barcode');
-        if (code) {
-            scanProductForOrder(code);
-            // Remove the param without full reload
-            const newUrl = window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
-        }
-    }, [scanProductForOrder]);
-
     const handleLoadLastOrder = () => {
         if (!lastOrder || !lastOrder.order_details) return;
 
@@ -226,7 +214,10 @@ const Orders = () => {
             <SelectProductModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSelect={(product) => scanProductForOrder(product.barcode || product.name)}
+                onSelectMultiple={(products) => {
+                    products.forEach(p => addOrderItem(p));
+                }}
+                onSelect={(product) => addOrderItem(product)}
                 sortByStock={true}
             />
 

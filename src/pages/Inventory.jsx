@@ -43,20 +43,13 @@ const Inventory = () => {
         fetchProducts();
     }, [fetchProducts]);
 
-    // Handle External App Scan Return and Query Filters
+    // Handle Query Filters
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const code = params.get('scanned_barcode');
         const filterStr = params.get('filter');
 
-        if (code) {
-            setSearchTerm(code);
-        }
         if (filterStr === 'low_stock') {
             setShowLowStockOnly(true);
-        }
-
-        if (code || filterStr) {
             // Remove the param without full reload
             const newUrl = window.location.pathname;
             window.history.replaceState({}, document.title, newUrl);

@@ -20,18 +20,6 @@ const Billing = () => {
     // Derived state
     const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
-    // Handle External App Scan Return
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('scanned_barcode');
-        if (code) {
-            scanProduct(code);
-            // Remove the param without full reload
-            const newUrl = window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
-        }
-    }, [scanProduct]);
-
     useEffect(() => {
         if (products.length === 0) {
             fetchProducts();
@@ -219,7 +207,10 @@ const Billing = () => {
                 <SelectProductModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
-                    onSelect={(product) => scanProduct(product.barcode || product.name)}
+                    onSelectMultiple={(products) => {
+                        products.forEach(p => addToCart(p));
+                    }}
+                    onSelect={(product) => addToCart(product)}
                 />
 
                 <BarcodeScannerModal
